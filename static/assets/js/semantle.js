@@ -16,7 +16,7 @@ let guessCount = 0;
 let model = null;
 let numPuzzles = 4650;
 const now = Date.now();
-const initialDate = new Date('2022-04-01T00:00:00+09:00');
+const initialDate = new Date('2025-04-14T00:00:00+09:00');
 const puzzleNumber = Math.floor((new Date() - initialDate) / 86400000) % numPuzzles;
 const yesterdayPuzzleNumber = (puzzleNumber + numPuzzles - 1) % numPuzzles;
 const storage = window.localStorage;
@@ -40,7 +40,6 @@ function share() {
     const copied = ClipboardJS.copy(text);
 
     if (copied) {
-        gtag('event', 'share');
         alert("클립보드로 복사했습니다.");
     }
     else {
@@ -59,18 +58,21 @@ function guessRow(similarity, oldGuess, percentile, guessNumber, guess) {
     if (similarity >= similarityStory.rest * 100 && percentile === '1000위 이상') {
         percentileText = '<span class="weirdWord">????<span class="tooltiptext">이 단어는 사전에는 없지만, 데이터셋에 포함되어 있으며 1,000위 이내입니다.</span></span>';
     }
+    let succesStyle = ''
     if (typeof percentile === 'number') {
             closeClass = "close";
             percentileText = `<span class="percentile">${percentile}</span>&nbsp;`;
             progress = ` <span class="progress-container">
 <span class="progress-bar" style="width:${(1001 - percentile)/10}%">&nbsp;</span>
 </span>`;
+
+        succesStyle = 'style="color: #246bfd;"';
     }
     let style = '';
     if (oldGuess === guess) {
         style = 'style="color: #f7617a;font-weight: 600;"';
     }
-    return `<tr><td>${guessNumber}</td><td ${style}>${oldGuess}</td><td>${similarity.toFixed(2)}</td><td class="${closeClass}">${percentileText}${progress}
+    return `<tr><td>${guessNumber}</td><td ${style}>${oldGuess}</td><td ${succesStyle}>${similarity.toFixed(2)}</td><td class="${closeClass}">${percentileText}
 </td></tr>`;
 
 }
@@ -127,11 +129,11 @@ function solveStory(guesses, puzzleNumber) {
 
     if (is_win) {
         return `${puzzleNumber}번째 꼬맨틀을 풀었습니다!\n${guessCountInfo}` +
-            `${timeInfo}${topGuessMsg}https://semantle-ko.newsjel.ly/`;
+            `${timeInfo}${topGuessMsg}https://quiz.hwooo.life`;
     }
 
     return `저런… ${puzzleNumber}번째 꼬맨틀을 포기했어요..ㅠ\n${guessCountInfo}` +
-            `${timeInfo}${topGuessMsg}https://semantle-ko.newsjel.ly/`;
+            `${timeInfo}${topGuessMsg}https://quiz.hwooo.life`;
 }
 
 let Semantle = (function() {
@@ -151,10 +153,6 @@ let Semantle = (function() {
         }
         const url = "/guess/" + puzzleNumber + "/" + word;
         const response = await fetch(url);
-        gtag('event', 'guess', {
-            'event_category' : 'game_event',
-            'event_label' : word,
-        });
         try {
             return await response.json();
         } catch (e) {
@@ -182,10 +180,6 @@ let Semantle = (function() {
     }
 
     async function init() {
-        let yesterday = await getYesterday()
-        $('#yesterday2').innerHTML = `어제의 정답 단어는 <b>"${yesterday}"</b>입니다.`;
-        $('#yesterday-nearest1k').innerHTML = `정답 단어와 비슷한, <a href="/nearest1k/${yesterdayPuzzleNumber}">유사도 기준 상위 1,000개의 단어</a>를 확인할 수 있습니다.`;
-
         try {
             similarityStory = await getSimilarityStory(puzzleNumber);
             $('#similarity-story').innerHTML = `
@@ -209,8 +203,6 @@ let Semantle = (function() {
         if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
             prefersDarkColorScheme = true;
         }
-
-        $("#settings-button").addEventListener('click', openSettings);
 
         document.querySelectorAll(".dialog-underlay, .dialog-close").forEach((el) => {
             el.addEventListener('click', () => {
@@ -264,15 +256,6 @@ let Semantle = (function() {
                     guesses.sort(function(a, b){return b[0]-a[0]});
                     updateGuesses(guess);
                     endGame(false, true);
-                    gtag('event', 'giveup', {
-                        'event_category' : 'game_event',
-                        'event_label' : 'giveup',
-                    });
-                    gtag('event', 'giveup', {
-                        'event_category' : 'game_event',
-                        'event_label' : 'guess_count',
-                        'value' : guessCount,
-                    });
                 }
             }
         });
@@ -311,11 +294,6 @@ let Semantle = (function() {
                     storage.setItem('startTime', Date.now())
                 }
                 guessCount += 1;
-                gtag('event', 'nth_guess', {
-                    'event_category' : 'game_event',
-                    'event_label' : guess,
-                    'value' : guessCount,
-                });
                 guessed.add(guess);
 
                 const newEntry = [similarity, guess, percentile, guessCount];
@@ -339,15 +317,6 @@ let Semantle = (function() {
 
             if (guessData.sim == 1 && !gameOver) {
                 endGame(true, true);
-                gtag('event', 'win', {
-                    'event_category' : 'game_event',
-                    'event_label' : 'win',
-                });
-                gtag('event', 'win', {
-                    'event_category' : 'game_event',
-                    'event_label' : 'guess_count',
-                    'value' : guessCount,
-                });
             }
             return false;
         });

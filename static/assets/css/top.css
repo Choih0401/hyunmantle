@@ -1,0 +1,58 @@
+#nearest {
+    max-width: 700px;
+    margin: 40px auto;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px;
+    color: #222;
+    line-height: 1.6;
+  }
+  
+  #nearest table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  #nearest th {
+    background-color: #f4f7fb;
+    text-align: center;
+    padding: 12px;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  #nearest td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+  }
+  
+  #nearest tr:nth-child(even) {
+    background-color: #f9fbff;
+  }
+  
+  #nearest tr:hover {
+    background-color: #eef3fb;
+  }
+  
+  #nearest b#day,
+  #nearest b#word {
+    color: #246bfd;
+  }
+  
+  a {
+    display: block;
+    text-align: center;
+    margin-top: 40px;
+    color: #246bfd;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
