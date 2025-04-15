@@ -91,9 +91,13 @@ def get_guess(day: int, word: str):
     rtn = {"guess": word}
     if day in app.ranks and word in app.ranks[day]:
         rtn["rank"], rtn["sim"] = app.ranks[day][word]
+        rtn["rank"] += 1
     else:
         if app.secrets[day] == word:
             word = app.secrets[day]
+            rtn["sim"] = "1"
+            rtn["rank"] = ""
+            return jsonify(rtn)
         # Check if word exists in the DB
         conn = sqlite3.connect('data/valid_guesses.db')
         cur = conn.cursor()
