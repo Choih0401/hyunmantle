@@ -1,16 +1,10 @@
 import pickle
 from typing import Tuple, List, Dict
+import sqlite3
+from sklearn.metrics.pairwise import cosine_similarity
 
 import numpy as np
 from numpy import array
-
-
-def most_similar(mat: array, idx: int, k: int) -> Tuple[array, array]:
-    vec = mat[idx]
-    dists = mat.dot(vec) / (np.linalg.norm(mat, axis=1) * np.linalg.norm(vec))
-    top_idxs = np.argpartition(dists, -k)[-k:]
-    dist_sort_args = dists[top_idxs].argsort()[::-1]
-    return top_idxs[dist_sort_args], dists[top_idxs][dist_sort_args]
 
 
 def dump_nearest(puzzle_num: int, word: str, words: List[str], mat: array, k: int = 1000) \
@@ -38,3 +32,20 @@ def get_nearest(puzzle_num: int, word: str, words: List[str], mat: array) -> Dic
             return pickle.load(f)
     except FileNotFoundError:
         return dump_nearest(puzzle_num, word, words, mat)
+
+def precompute_top_k(day: int, secret_word: str, k: int = 1000):
+    conn = sqlite3.connect('data/valid_guesses.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT word, vec FROM guesses")
+    rows = cursor.fetchall()
+    conn.close()
+
+    secret_vec = model.encode(secret_word)
+    scores = []
+    for word, vec_blob in rows:
+        vec = pickle.loads(vec_blob)
+        sim = float(cosine_similarity(secret_vec, vec))
+        if word != secret_word:
+            scores.append((word, sim))
+    top_k = sorted(scores, key=lambda x: x[1], reverse=True)[:k]
+    return {w: (i, s) for i, (w, s) in enumerate(top_k)}

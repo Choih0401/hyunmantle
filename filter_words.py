@@ -29,35 +29,36 @@ if __name__ == '__main__':
     # frequent_words
     with open('data/frequent_words.txt', 'r', encoding='UTF-8') as f:
         words = list(unicodedata.normalize('NFC', line.strip()) for line in tqdm.tqdm(f))
-    filtered_words = []
+    filtered_words = words
 
-    for index, out in enumerate(tqdm.tqdm(pipe(x for x in words), total=len(words))):
-        label = get_predicated_label(out, 0.5)
-        try:
-            if label['label'] == 'clean':
-                filtered_words.append(words[index])
-            else:
-                print(f'filtered: {words[index]} - {label["label"]}/{label["score"]}')
-        except:
-            print(f'unknown: {words[index]}')
+    # for index, out in enumerate(tqdm.tqdm(pipe(x for x in words), total=len(words))):
+    #     label = get_predicated_label(out, 0.5)
+    #     try:
+    #         if label['label'] == 'clean':
+    #             filtered_words.append(words[index])
+    #         else:
+    #             print(f'filtered: {words[index]} - {label["label"]}/{label["score"]}')
+    #     except:
+    #         print(f'unknown: {words[index]}')
 
-    with open('data/filtered_frequent_words.txt', 'w', encoding='UTF-8') as f:
-        f.write('\n'.join(tqdm.tqdm(filtered_words)))
+    # with open('data/filtered_frequent_words.txt', 'w', encoding='UTF-8') as f:
+    #     f.write('\n'.join(tqdm.tqdm(filtered_words)))
 
     # dictionary
     with open('data/ko-aff-dic-0.7.92/ko.dic', 'r', encoding='UTF-8') as f:
         words = list(unicodedata.normalize('NFC', line.strip().split('/')[0]) for line in tqdm.tqdm(f))
-    filtered_words = []
+    filtered_words2 = words
+    result = filtered_words + filtered_words2
 
-    for index, out in enumerate(tqdm.tqdm(pipe(x for x in words), total=len(words))):
-        label = get_predicated_label(out, 0.5)
-        try:
-            if label['label'] == 'clean':
-                filtered_words.append(words[index])
-            else:
-                print(f'filtered: {words[index]} - {label["label"]}/{label["score"]}')
-        except:
-            print(f'unknown: {words[index]}')
+    # for index, out in enumerate(tqdm.tqdm(pipe(x for x in words), total=len(words))):
+    #     label = get_predicated_label(out, 0.5)
+    #     try:
+    #         if label['label'] == 'clean':
+    #             filtered_words.append(words[index])
+    #         else:
+    #             print(f'filtered: {words[index]} - {label["label"]}/{label["score"]}')
+    #     except:
+    #         print(f'unknown: {words[index]}')
 
     with open('data/ko-aff-dic-0.7.92/ko_filtered.txt', 'w', encoding='UTF-8') as f:
-        f.write('\n'.join(tqdm.tqdm(filtered_words)))
+        f.write('\n'.join(tqdm.tqdm(result)))
