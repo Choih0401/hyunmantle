@@ -1,6 +1,8 @@
 version: "3.9"
 services:
   app:
+    container_name: hyunmantle
+    image: choih0401/hyunmantle
     build:
       context: .
       dockerfile: Dockerfile
