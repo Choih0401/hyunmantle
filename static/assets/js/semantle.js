@@ -89,11 +89,11 @@ function solveStory(guesses, puzzleNumber) {
     if (is_win) {
         guess_count += 1
         if (guess_count == 1) {
-            return `이럴 수가! 첫번째 추측에서 ${puzzleNumber}번째 꼬맨틀 정답 단어를 맞혔습니다!\nhttps://semantle-ko.newsjel.ly/`;
+            return `이럴 수가! 첫번째 추측에서 ${puzzleNumber}번째 꼬맨틀 정답 단어를 맞혔습니다!\nhttps://quiz.hwooo.life/`;
         }
     }
     if (guess_count == 0) {
-        return `${puzzleNumber}번째 꼬맨틀을 시도하지 않고 바로 포기했어요.\nhttps://semantle-ko.newsjel.ly/`;
+        return `${puzzleNumber}번째 꼬맨틀을 시도하지 않고 바로 포기했어요.\nhttps://quiz.hwooo.life/`;
     }
 
     let describe = function(similarity, percentile) {
