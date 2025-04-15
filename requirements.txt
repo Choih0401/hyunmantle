@@ -6,6 +6,7 @@ gunicorn
 tqdm
 transformers
 sentence-transformers
+pytz
 
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch
