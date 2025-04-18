@@ -89,11 +89,11 @@ function solveStory(guesses, puzzleNumber) {
     if (is_win) {
         guess_count += 1
         if (guess_count == 1) {
-            return `이럴 수가! 첫번째 추측에서 ${puzzleNumber}번째 꼬맨틀 정답 단어를 맞혔습니다!\nhttps://quiz.hwooo.life/`;
+            return `이럴 수가! 첫번째 추측에서 ${puzzleNumber}번째 현맨틀 정답 단어를 맞혔습니다!\nhttps://quiz.hwooo.life/`;
         }
     }
     if (guess_count == 0) {
-        return `${puzzleNumber}번째 꼬맨틀을 시도하지 않고 바로 포기했어요.\nhttps://quiz.hwooo.life/`;
+        return `${puzzleNumber}번째 현맨틀을 시도하지 않고 바로 포기했어요.\nhttps://quiz.hwooo.life/`;
     }
 
     let describe = function(similarity, percentile) {
@@ -128,11 +128,11 @@ function solveStory(guesses, puzzleNumber) {
     }
 
     if (is_win) {
-        return `${puzzleNumber}번째 꼬맨틀을 풀었습니다!\n${guessCountInfo}` +
+        return `${puzzleNumber}번째 현맨틀을 풀었습니다!\n${guessCountInfo}` +
             `${timeInfo}${topGuessMsg}https://quiz.hwooo.life`;
     }
 
-    return `저런… ${puzzleNumber}번째 꼬맨틀을 포기했어요..ㅠ\n${guessCountInfo}` +
+    return `저런… ${puzzleNumber}번째 현맨틀을 포기했어요..ㅠ\n${guessCountInfo}` +
             `${timeInfo}${topGuessMsg}https://quiz.hwooo.life`;
 }
 
@@ -183,7 +183,7 @@ let Semantle = (function() {
         try {
             similarityStory = await getSimilarityStory(puzzleNumber);
             $('#similarity-story').innerHTML = `
-            ${puzzleNumber}번째 꼬맨틀의 정답 단어를 맞혀보세요.<br/>
+            ${puzzleNumber}번째 현맨틀의 정답 단어를 맞혀보세요.<br/>
             정답 단어와 가장 유사한 단어의 유사도는 <b>${(similarityStory.top * 100).toFixed(2)}</b> 입니다.
             10번째로 유사한 단어의 유사도는 ${(similarityStory.top10 * 100).toFixed(2)}이고,
             1,000번째로 유사한 단어의 유사도는 ${(similarityStory.rest * 100).toFixed(2)} 입니다.`;
@@ -476,11 +476,11 @@ let Semantle = (function() {
         response += `<input type="button" value="기록 복사하기" id="result" onclick="share()" class="button"><br />`
         const totalGames = stats['wins'] + stats['giveups'] + stats['abandons'];
         response += `<br/>
-        ${puzzleNumber + 1}번째 꼬맨틀은 오늘 밤 자정(한국 시간 기준)에 열립니다.<br/>
+        ${puzzleNumber + 1}번째 현맨틀은 오늘 밤 자정(한국 시간 기준)에 열립니다.<br/>
 <br/>
 <b>나의 플레이 기록</b>: <br/>
 <table>
-<tr><th>가장 처음 풀었던 꼬맨틀 번호:</th><td>${stats['firstPlay']}</td></tr>
+<tr><th>가장 처음 풀었던 현맨틀 번호:</th><td>${stats['firstPlay']}</td></tr>
 <tr><th>도전한 게임 횟수:</th><td>${totalGames}</td></tr>
 <tr><th>정답 횟수:</th><td>${stats['wins']}</td></tr>
 <tr><th>연속 정답 횟수:</th><td>${stats['winStreak']}</td></tr>
