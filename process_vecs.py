@@ -32,23 +32,6 @@ def count_lines(filepath):
     with open(filepath, "r", encoding="utf-8", errors='ignore') as f:
         return sum(bl.count("\n") for bl in tqdm(blocks(f), desc='Counting lines', mininterval=1))
 
-def precompute_top_k(day: int, secret_word: str, k: int = 1000):
-    conn = sqlite3.connect('data/valid_guesses.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT word, vec FROM guesses")
-    rows = cursor.fetchall()
-    conn.close()
-
-    secret_vec = model.encode(secret_word)
-    scores = []
-    for word, vec_blob in rows:
-        vec = pickle.loads(vec_blob)
-        sim = float(cosine_similarity(secret_vec.reshape(1, -1), vec.reshape(1, -1))[0][0])  # Update cosine similarity usage
-        if word != secret_word:
-            scores.append((word, sim))
-    top_k = sorted(scores, key=lambda x: x[1], reverse=True)[:k]
-    return {w: (i, s) for i, (w, s) in enumerate(top_k)}
-
 model = SentenceTransformer("jhgan/ko-sroberta-multitask")
 
 # 단어 리스트 불러오기 (기존 코드 활용)
