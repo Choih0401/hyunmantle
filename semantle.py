@@ -1,9 +1,9 @@
 import pickle
 import sqlite3
 from datetime import date, datetime
-from sentence_transformers import SentenceTransformer
 from numpy.linalg import norm
 import numpy as np
+from gensim.models import word2vec
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -18,7 +18,8 @@ from pytz import utc, timezone
 
 KST = timezone('Asia/Seoul')
 
-model = SentenceTransformer("jhgan/ko-sroberta-multitask")
+# Word2Vec 모델 로드
+model = word2vec.Word2Vec.load("data/namu.model")
 
 def cosine_similarity(vec1, vec2):
     return np.dot(vec1, vec2) / (norm(vec1) * norm(vec2))
@@ -30,7 +31,12 @@ def precompute_top_k(day: int, secret_word: str, k: int = 1000):
     rows = cursor.fetchall()
     conn.close()
 
-    secret_vec = model.encode(secret_word)
+    try:
+        secret_vec = model.wv[secret_word]
+    except KeyError:
+        # 비밀 단어가 학습에 없으면 0으로 처리
+        return {}
+
     scores = []
     for word, vec_blob in rows:
         vec = pickle.loads(vec_blob)
@@ -94,26 +100,29 @@ def get_guess(day: int, word: str):
         rtn["rank"] += 1
     else:
         if app.secrets[day] == word:
-            word = app.secrets[day]
             rtn["sim"] = "1"
             rtn["rank"] = "정답"
             return jsonify(rtn)
-        # Check if word exists in the DB
+
+        # DB 조회
         conn = sqlite3.connect('data/valid_guesses.db')
         cur = conn.cursor()
         cur.execute('SELECT vec FROM guesses WHERE word == ?', (word,))
         row = cur.fetchone()
         conn.close()
+
         try:
-            vec1 = model.encode(app.secrets[day])
-            vec2 = pickle.loads(row[0])
+            vec1 = model.wv[app.secrets[day]]
+            if row:
+                vec2 = pickle.loads(row[0])
+            else:
+                vec2 = model.wv[word]  # DB에 없으면 모델에서 직접 가져오기
             rtn["sim"] = float(cosine_similarity(vec1, vec2))
             rtn["rank"] = "1000위 이상"
-        except Exception:
-            vec1 = model.encode(app.secrets[day])
-            vec2 = model.encode(word)
-            rtn["sim"] = float(cosine_similarity(vec1, vec2))
-            rtn["rank"] = "1000위 이상"
+        except KeyError:
+            # 모델에도 없는 단어
+            rtn["sim"] = 0.0
+            rtn["rank"] = "미등록 단어"
     return jsonify(rtn)
 
 @app.route('/similarity/<int:day>')
@@ -121,9 +130,7 @@ def get_similarity(day: int):
     if day not in app.ranks:
         return jsonify({"error": "no data"}), 404
 
-    # 유사도만 뽑아서 정렬
     sims = sorted([sim for _, sim in app.ranks[day].values()], reverse=True)
-
     return jsonify({
         "top": sims[0],
         "top10": sims[9] if len(sims) > 9 else sims[-1],

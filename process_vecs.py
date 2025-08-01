@@ -7,6 +7,7 @@ import re
 from tqdm import tqdm
 import numpy as np
 from numpy import array
+from gensim.models import word2vec
 from sklearn.metrics.pairwise import cosine_similarity  # Add this import
 
 def is_hangul(text) -> bool:
@@ -32,7 +33,7 @@ def count_lines(filepath):
     with open(filepath, "r", encoding="utf-8", errors='ignore') as f:
         return sum(bl.count("\n") for bl in tqdm(blocks(f), desc='Counting lines', mininterval=1))
 
-model = SentenceTransformer("jhgan/ko-sroberta-multitask")
+model = word2vec.Word2Vec.load("data/namu.model")
 
 # 단어 리스트 불러오기 (기존 코드 활용)
 normal_words = load_dic('data/ko-aff-dic-0.7.92/ko_filtered.txt')
@@ -44,8 +45,13 @@ cursor.execute("CREATE TABLE IF NOT EXISTS guesses (word text PRIMARY KEY, vec b
 valid_nearest = []
 valid_nearest_mat = []
 
-for word in tqdm(normal_words, desc="Embedding with SBERT"):
-    vec = model.encode(word)
+for word in tqdm(normal_words, desc="Embedding with Word2Vec"):
+    try:
+        # Word2Vec 벡터 가져오기
+        vec = model.wv[word]  # numpy array
+    except KeyError:
+        # 학습 데이터에 없는 단어는 스킵
+        continue
     cursor.execute("INSERT OR REPLACE INTO guesses VALUES (?, ?)", (word, pickle.dumps(vec)))
     valid_nearest.append(word)
     valid_nearest_mat.append(vec)
